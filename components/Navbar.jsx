@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 
 const navLinks = [
@@ -12,30 +12,70 @@ const navLinks = [
 
 export default function Navbar({ quoteOpen = false, solid = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const lastScrollY = useRef(0);
 
-  // solid=true → always navy; solid=false → transparent or warm-off-white when quoteOpen
-  const darkText = solid ? false : quoteOpen; // solid=navy(light text), quoteOpen=offwhite(dark text)
+  useEffect(() => {
+    function handle(y, ref) {
+      if (y === 0) {
+        setHidden(false);
+      } else if (y > ref.current + 10) {
+        setHidden(true);
+      } else if (y < ref.current - 10) {
+        setHidden(false);
+      }
+      setIsScrolled(y > 50);
+      ref.current = y;
+    }
 
-  const navBg = solid
+    function onWindowScroll() {
+      handle(window.scrollY, lastScrollY);
+    }
+
+    function onPanelScroll(e) {
+      handle(e.detail.scrollTop, lastScrollY);
+    }
+
+    window.addEventListener('scroll', onWindowScroll, { passive: true });
+    window.addEventListener('panelscroll', onPanelScroll);
+    return () => {
+      window.removeEventListener('scroll', onWindowScroll);
+      window.removeEventListener('panelscroll', onPanelScroll);
+    };
+  }, []);
+
+  const darkText = solid ? false : false;
+
+  const navBg = quoteOpen
+    ? 'rgba(4, 7, 20, 0.65)'
+    : isScrolled
+    ? 'rgba(4, 7, 20, 0.65)'
+    : solid
     ? '#0D1557'
-    : quoteOpen
-    ? 'rgba(237,232,222,0.95)'
     : 'transparent';
 
-  const shadow = solid ? '0 2px 20px rgba(0,0,0,0.3)' : 'none';
-  const borderBottom = solid ? '2px solid #00838F' : 'none';
+  const backdropBlur = (isScrolled || quoteOpen) ? 'blur(16px)' : 'none';
+  const shadow = (isScrolled || quoteOpen) ? '0 10px 40px rgba(0,0,0,0.2)' : 'none';
+  const borderBottom = (isScrolled || quoteOpen) ? '1px solid rgba(255,255,255,0.05)' : 'none';
 
-  const linkColor = darkText
-    ? 'rgba(13,21,87,0.6)'
-    : 'rgba(255,255,255,0.7)';
+  const linkColor = darkText ? 'rgba(13,21,87,0.6)' : 'rgba(255,255,255,0.7)';
   const linkHoverUnder = darkText ? '#0D1557' : 'rgba(255,255,255,0.6)';
   const logoColor = darkText ? '#0D1557' : '#ffffff';
   const hamburgerColor = darkText ? '#0D1557' : '#ffffff';
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 h-[68px] flex items-center px-6 md:px-12 transition-all duration-500"
-      style={{ background: navBg, boxShadow: shadow, borderBottom }}
+      className="fixed top-0 left-0 right-0 z-50 h-[68px] flex items-center px-6 md:px-12"
+      style={{
+        background: navBg,
+        boxShadow: shadow,
+        borderBottom,
+        backdropFilter: backdropBlur,
+        WebkitBackdropFilter: backdropBlur,
+        transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
+        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s ease, box-shadow 0.5s ease, backdrop-filter 0.5s ease',
+      }}
     >
       {/* Left: Brand */}
       <div className="flex flex-1 justify-start">
@@ -124,16 +164,10 @@ export default function Navbar({ quoteOpen = false, solid = false }) {
               key={i}
               className={`block w-5 h-[1.5px] transition-all duration-300 ${
                 i === 0
-                  ? menuOpen
-                    ? 'translate-y-[6.5px] rotate-45'
-                    : ''
+                  ? menuOpen ? 'translate-y-[6.5px] rotate-45' : ''
                   : i === 1
-                  ? menuOpen
-                    ? 'opacity-0'
-                    : ''
-                  : menuOpen
-                  ? '-translate-y-[6.5px] -rotate-45'
-                  : ''
+                  ? menuOpen ? 'opacity-0' : ''
+                  : menuOpen ? '-translate-y-[6.5px] -rotate-45' : ''
               }`}
               style={{ background: hamburgerColor }}
             />
@@ -144,35 +178,42 @@ export default function Navbar({ quoteOpen = false, solid = false }) {
       {/* Mobile dropdown */}
       {menuOpen && (
         <div
-          className="md:hidden absolute top-[68px] left-0 right-0 backdrop-blur-md flex flex-col py-5 px-6 gap-5 z-50"
+          className="md:hidden fixed inset-0 top-[68px] backdrop-blur-3xl flex flex-col pt-12 pb-20 px-8 gap-8 z-50 overflow-y-auto"
           style={{
-            background:
-              solid || !darkText ? 'rgba(13,21,87,0.97)' : 'rgba(237,232,222,0.97)',
+            background: solid || !darkText ? 'rgba(8,13,46,0.95)' : 'rgba(234,229,217,0.95)',
+            minHeight: 'calc(100vh - 68px)',
           }}
         >
-          {navLinks.map((link) => (
+          <div className="flex flex-col gap-6 mt-4">
+            {navLinks.map((link, i) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="font-display font-bold text-[2.5rem] tracking-tight transition-colors duration-200 block"
+                style={{
+                  color: solid || !darkText ? '#ffffff' : '#080D2E',
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          
+          <div className="mt-auto">
+            <div className="h-px w-full mb-8" style={{ background: solid || !darkText ? 'rgba(255,255,255,0.1)' : 'rgba(8,13,46,0.1)' }} />
             <Link
-              key={link.href}
-              href={link.href}
+              href="/contact"
               onClick={() => setMenuOpen(false)}
-              className="font-dmsans font-medium text-[0.95rem] transition-colors duration-200"
-              style={{
-                color:
-                  solid || !darkText
-                    ? 'rgba(255,255,255,0.8)'
-                    : 'rgba(13,21,87,0.7)',
-              }}
+              className="inline-flex items-center gap-2 font-dmsans font-bold text-[0.85rem] tracking-[0.15em] uppercase px-8 py-4 rounded-full bg-[#00BCD4] text-[#080D2E] shadow-[0_10px_30px_rgba(0,188,212,0.3)]"
             >
-              {link.label}
+              Get A Quote →
             </Link>
-          ))}
-          <Link
-            href="/contact"
-            onClick={() => setMenuOpen(false)}
-            className="self-start font-dmsans font-medium text-[0.8rem] tracking-[0.1em] uppercase px-5 py-2 rounded-full mt-1 bg-[#00838F] text-white"
-          >
-            Get A Quote
-          </Link>
+            <div className="mt-8">
+               <p className="font-dmsans font-medium text-[0.6rem] tracking-[0.2em] uppercase mb-2" style={{ color: solid || !darkText ? 'rgba(255,255,255,0.4)' : 'rgba(8,13,46,0.4)' }}>Talk directly with us</p>
+               <a href="tel:+918043853656" className="font-dmsans font-medium text-[1.1rem]" style={{ color: solid || !darkText ? '#ffffff' : '#080D2E' }}>+91 80438 53656</a>
+            </div>
+          </div>
         </div>
       )}
     </nav>

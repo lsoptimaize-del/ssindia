@@ -18,10 +18,12 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "SS India Corporation — Bulk Welding Rods, Hubli",
+  title: "SS India Corporation - Bulk Welding Rods, Hubli",
   description:
     "Karnataka's fastest growing INDARC distributor. Bulk welding rods, verified supplier, 24hr dispatch from Hubli.",
 };
+
+import SmoothScroll from "@/components/SmoothScroll";
 
 export default function RootLayout({
   children,
@@ -33,7 +35,9 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#0D1557]">{children}</body>
+      <body className="min-h-full flex flex-col bg-[#0D1557]">
+        <SmoothScroll>{children}</SmoothScroll>
+      </body>
     </html>
   );
 }
