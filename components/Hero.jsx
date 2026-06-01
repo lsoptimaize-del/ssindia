@@ -583,7 +583,7 @@ export default function Hero({ quoteOpen, onQuoteChange }) {
   return (
     <>
       {/* ── VIDEO HERO ── */}
-      <section className="relative h-screen w-full overflow-hidden bg-black">
+      <section className="relative h-[100dvh] w-full overflow-hidden bg-black touch-none">
         <video
           ref={videoRef}
           muted
