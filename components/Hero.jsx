@@ -468,28 +468,76 @@ export default function Hero({ quoteOpen, onQuoteChange }) {
   // IDLE: scroll down → start video
   useEffect(() => {
     if (phase !== S.IDLE) return;
+    let touchStartY = 0;
+
     function onWheel(e) {
       if (e.deltaY <= 0 || scrollLock.current) return;
       scrollLock.current = true;
       startVideo();
       setTimeout(() => { scrollLock.current = false; }, 1200);
     }
+
+    function onTouchStart(e) {
+      touchStartY = e.touches[0].clientY;
+    }
+
+    function onTouchEnd(e) {
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaY = touchStartY - touchEndY;
+      if (deltaY > 40 && !scrollLock.current) {
+        scrollLock.current = true;
+        startVideo();
+        setTimeout(() => { scrollLock.current = false; }, 1200);
+      }
+    }
+
     window.addEventListener('wheel', onWheel, { passive: true });
-    return () => window.removeEventListener('wheel', onWheel);
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchend', onTouchEnd);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
   // END: scroll down → open panel
   useEffect(() => {
     if (phase !== S.END) return;
+    let touchStartY = 0;
+
     function onWheel(e) {
       if (e.deltaY <= 0 || scrollLock.current) return;
       scrollLock.current = true;
       setTimeout(() => { scrollLock.current = false; }, 1400);
       handleQuoteOpen();
     }
+
+    function onTouchStart(e) {
+      touchStartY = e.touches[0].clientY;
+    }
+
+    function onTouchEnd(e) {
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaY = touchStartY - touchEndY;
+      if (deltaY > 40 && !scrollLock.current) {
+        scrollLock.current = true;
+        setTimeout(() => { scrollLock.current = false; }, 1400);
+        handleQuoteOpen();
+      }
+    }
+
     window.addEventListener('wheel', onWheel, { passive: true });
-    return () => window.removeEventListener('wheel', onWheel);
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchend', onTouchEnd);
+    };
   }, [phase, handleQuoteOpen]);
 
   // Panel: scroll up at top → close
