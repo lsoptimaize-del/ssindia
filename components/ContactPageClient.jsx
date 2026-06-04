@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Footer from './Footer';
 import ContactForm from './ContactForm';
 
@@ -117,10 +118,12 @@ export default function ContactPageClient() {
     <>
       {/* ── MOBILE HERO BANNER (Top) ── */}
       <div className="md:hidden w-full h-[35vh] relative overflow-hidden bg-[#080D2E]">
-        <img
+        <Image
           src="/contact_hero.png"
           alt="Corporate Engineering Desk"
-          className="w-full h-full object-cover opacity-60"
+          fill
+          className="object-cover opacity-60"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#080D2E] via-[#080D2E]/40 to-transparent opacity-100" />
       </div>
@@ -135,10 +138,13 @@ export default function ContactPageClient() {
             transition: 'transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
-          <img
+          <Image
             src="/contact_hero.png"
             alt="Corporate Engineering Desk"
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            priority
+            className="object-cover"
+            sizes="(min-width: 1024px) 50vw, 45vw"
           />
           <div
             className="absolute inset-0"

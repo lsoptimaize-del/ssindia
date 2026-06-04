@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import Footer from './Footer';
 import ContactForm from './ContactForm';
 
-const S = { IDLE: 'idle', PLAYING: 'playing', END: 'end' };
+
 
 const CARDS = [
   {
@@ -132,10 +133,12 @@ function ProductCard({ card, visible }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <img
+      <Image
         src={card.img}
         alt={`INDARC ${card.size}mm welding rods`}
-        className="absolute inset-0 w-full h-full object-cover"
+        fill
+        className="object-cover"
+        sizes="(min-width: 768px) 33vw, 100vw"
         style={{
           transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
           transform: hovered ? 'scale(1.08)' : 'scale(1)',
@@ -184,13 +187,13 @@ function ProductCard({ card, visible }) {
         <p className="font-dmsans font-medium text-white/55 text-[0.68rem] tracking-[0.35em] uppercase mb-10">
           Welding Rods
         </p>
-        <a
-          href={`mailto:contact@ssindia.in?subject=${card.mailto}`}
+        <Link
+          href={`/contact?product=${card.size}mm`}
           className="font-dmsans font-medium text-[0.72rem] tracking-[0.15em] uppercase text-white/80 border border-white/20 px-6 py-2.5 rounded-full hover:border-[#C9A96E] hover:text-[#C9A96E] transition-all duration-300"
           onClick={(e) => e.stopPropagation()}
         >
           Request Quote →
-        </a>
+        </Link>
       </div>
     </div>
   );
@@ -232,7 +235,7 @@ function MobileWhyUsSection() {
             className="absolute inset-0 transition-opacity duration-700"
             style={{ opacity: i === activeIndex ? 1 : 0 }}
           >
-            <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+            <Image src={item.img} alt={item.title} fill className="object-cover" sizes="100vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#080D2E] via-[#080D2E]/40 to-transparent" />
             <div className="absolute top-1/2 -translate-y-1/2 left-4">
                <p className="font-display font-bold text-white/10 leading-none" style={{ fontSize: '8rem', letterSpacing: '-0.04em' }}>
@@ -326,10 +329,12 @@ function WhyUsSection({ panelRef }) {
           >
             {WHY_US.map((item, i) => (
               <div key={i} className="h-full flex-shrink-0 relative" style={{ width: `${100 / n}%` }}>
-                <img
+                <Image
                   src={item.img}
                   alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#080D2E]/80 to-transparent md:bg-black/10" />
               </div>
@@ -430,9 +435,6 @@ function WhyUsSection({ panelRef }) {
 }
 
 export default function Hero({ quoteOpen, onQuoteChange }) {
-  const [phase, setPhaseState] = useState(S.IDLE);
-  const phaseRef = useRef(S.IDLE);
-
   const [showSizes, setShowSizes] = useState(false);
   const [showTitle, setShowTitle] = useState(false);
   const [showCTA, setShowCTA] = useState(false);
@@ -441,20 +443,7 @@ export default function Hero({ quoteOpen, onQuoteChange }) {
   const [visibleCards, setVisibleCards] = useState([false, false, false]);
 
   const scrollLock = useRef(false);
-  const videoRef = useRef(null);
   const panelRef = useRef(null);
-
-  function setPhase(p) {
-    phaseRef.current = p;
-    setPhaseState(p);
-  }
-
-  function startVideo() {
-    const v = videoRef.current;
-    if (!v) return;
-    v.play();
-    setPhase(S.PLAYING);
-  }
 
   const handleQuoteOpen = useCallback(() => { onQuoteChange(true); }, [onQuoteChange]);
 
@@ -465,15 +454,15 @@ export default function Hero({ quoteOpen, onQuoteChange }) {
     setTimeout(() => onQuoteChange(false), 750);
   }, [onQuoteChange]);
 
-  // IDLE: scroll down → start video
+  // Scroll/Touch handler to open the quote panel
   useEffect(() => {
-    if (phase !== S.IDLE) return;
+    if (quoteOpen) return;
     let touchStartY = 0;
 
     function onWheel(e) {
       if (e.deltaY <= 0 || scrollLock.current) return;
       scrollLock.current = true;
-      startVideo();
+      handleQuoteOpen();
       setTimeout(() => { scrollLock.current = false; }, 1200);
     }
 
@@ -486,7 +475,7 @@ export default function Hero({ quoteOpen, onQuoteChange }) {
       const deltaY = touchStartY - touchEndY;
       if (deltaY > 40 && !scrollLock.current) {
         scrollLock.current = true;
-        startVideo();
+        handleQuoteOpen();
         setTimeout(() => { scrollLock.current = false; }, 1200);
       }
     }
@@ -500,45 +489,7 @@ export default function Hero({ quoteOpen, onQuoteChange }) {
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchend', onTouchEnd);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase]);
-
-  // END: scroll down → open panel
-  useEffect(() => {
-    if (phase !== S.END) return;
-    let touchStartY = 0;
-
-    function onWheel(e) {
-      if (e.deltaY <= 0 || scrollLock.current) return;
-      scrollLock.current = true;
-      setTimeout(() => { scrollLock.current = false; }, 1400);
-      handleQuoteOpen();
-    }
-
-    function onTouchStart(e) {
-      touchStartY = e.touches[0].clientY;
-    }
-
-    function onTouchEnd(e) {
-      const touchEndY = e.changedTouches[0].clientY;
-      const deltaY = touchStartY - touchEndY;
-      if (deltaY > 40 && !scrollLock.current) {
-        scrollLock.current = true;
-        setTimeout(() => { scrollLock.current = false; }, 1400);
-        handleQuoteOpen();
-      }
-    }
-
-    window.addEventListener('wheel', onWheel, { passive: true });
-    window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchend', onTouchEnd, { passive: true });
-    
-    return () => {
-      window.removeEventListener('wheel', onWheel);
-      window.removeEventListener('touchstart', onTouchStart);
-      window.removeEventListener('touchend', onTouchEnd);
-    };
-  }, [phase, handleQuoteOpen]);
+  }, [quoteOpen, handleQuoteOpen]);
 
   // Panel: scroll up at top → close
   function handlePanelWheel(e) {
@@ -551,16 +502,13 @@ export default function Hero({ quoteOpen, onQuoteChange }) {
     }
   }
 
-  // Stagger end overlay text
+  // Stagger entry animations on mount
   useEffect(() => {
-    if (phase === S.END) {
-      const t1 = setTimeout(() => setShowSizes(true), 0);
-      const t2 = setTimeout(() => setShowTitle(true), 500);
-      const t3 = setTimeout(() => setShowCTA(true), 1050);
-      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-    }
-    setShowSizes(false); setShowTitle(false); setShowCTA(false);
-  }, [phase]);
+    const t1 = setTimeout(() => setShowSizes(true), 100);
+    const t2 = setTimeout(() => setShowTitle(true), 400);
+    const t3 = setTimeout(() => setShowCTA(true), 750);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, []);
 
   // Panel expand
   useEffect(() => {
@@ -576,116 +524,99 @@ export default function Hero({ quoteOpen, onQuoteChange }) {
     return () => cancelAnimationFrame(raf);
   }, [quoteOpen]);
 
-  const isIdle = phase === S.IDLE;
-  const isEnd = phase === S.END;
-  const isPlaying = phase === S.PLAYING;
-
   return (
     <>
-      {/* ── VIDEO HERO ── */}
+      {/* ── IMAGE HERO ── */}
       <section className="relative h-[100dvh] w-full overflow-hidden bg-black touch-none">
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          preload="auto"
-          onEnded={() => setPhase(S.END)}
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/hero.mp4" type="video/mp4" />
-        </video>
+        <Image
+          src="/hero_frame.jpg"
+          alt="SS India Corporation INDARC Welding Rods"
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
 
         <div
-          className="absolute inset-0 transition-opacity duration-700"
+          className="absolute inset-0"
           style={{
-            opacity: isPlaying ? 0.35 : 1,
             background: 'linear-gradient(160deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 45%, rgba(0,0,0,0.85) 100%)',
           }}
         />
 
-        {/* PLAYING overlay */}
-        <div
-          className="absolute inset-0 z-10 flex flex-col items-start justify-end px-10 md:px-16 pb-16 transition-opacity duration-700"
-          style={{ opacity: isPlaying ? 1 : 0, pointerEvents: 'none' }}
-        >
-          <p
-            className="font-dmsans font-medium text-[0.68rem] tracking-[0.3em] uppercase text-white/70 mb-4"
+        {/* Hero Content */}
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4 md:px-6">
+          {/* Subtitle / Location */}
+          <div
             style={{
-              opacity: isPlaying ? 1 : 0,
-              transform: isPlaying ? 'translateY(0)' : 'translateY(12px)',
-              transition: 'opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s',
-              textShadow: '0 1px 10px rgba(0,0,0,0.8)'
+              opacity: showSizes ? 1 : 0,
+              transform: showSizes ? 'translateY(0)' : 'translateY(10px)',
+              transition: 'opacity 0.6s ease, transform 0.6s ease',
             }}
           >
-            Hubli, Karnataka &nbsp;·&nbsp; INDARC Authorised Distributor
-          </p>
-          <h2
-            className="font-display font-bold text-white leading-[1.05]"
-            style={{
-              fontSize: 'clamp(2rem, 4.5vw, 4rem)',
-              textShadow: '0 2px 32px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.8)',
-              opacity: isPlaying ? 1 : 0,
-              transform: isPlaying ? 'translateY(0)' : 'translateY(16px)',
-              transition: 'opacity 0.6s ease 0.45s, transform 0.6s ease 0.45s',
-            }}
-          >
-            Bulk Welding Rods.<br /><em>Ready Stock. 24hr Dispatch.</em>
-          </h2>
-        </div>
-
-        {/* IDLE */}
-        <div
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4 md:px-6 transition-opacity duration-500"
-          style={{ opacity: isIdle ? 1 : 0, pointerEvents: isIdle ? 'auto' : 'none' }}
-        >
-          <p className="font-dmsans font-medium text-[0.55rem] md:text-[0.67rem] tracking-[0.2em] md:tracking-[0.3em] uppercase text-white/80 mb-5 md:mb-8 drop-shadow-xl mx-auto leading-relaxed">
-            <span className="md:hidden">INDARC E6013 &nbsp;·&nbsp; Hubli</span>
-            <span className="hidden md:inline">INDARC E6013 Welding Rods &nbsp;·&nbsp; Hubli, Karnataka</span>
-          </p>
-          <h1
-            className="font-display font-bold text-white leading-[1.05] md:leading-[1.03] mb-5 md:mb-6"
-            style={{ fontSize: 'clamp(2.5rem, 10vw, 6.2rem)', textShadow: '0 4px 40px rgba(0,0,0,0.9), 0 2px 10px rgba(0,0,0,0.6)' }}
-          >
-            Bulk Welding Rods.
-            <br />
-            <em style={{ fontSize: 'clamp(2.2rem, 9vw, 6.2rem)' }}>Authorised Distributor.</em>
-          </h1>
-          <p
-            className="font-dmsans font-light text-white/90 text-[0.85rem] md:text-[1rem] tracking-wide max-w-[290px] md:max-w-[420px] mb-10 md:mb-12 leading-[1.6] md:leading-relaxed mx-auto"
-            style={{ textShadow: '0 2px 16px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.8)' }}
-          >
-            <span className="md:hidden">Karnataka's trusted supplier of genuine INDARC electrodes. Ready stock for fast dispatch.</span>
-            <span className="hidden md:inline">Karnataka's trusted bulk supplier of genuine INDARC welding electrodes. Ready stock in Hubli for fast dispatch to contractors and fabrication teams.</span>
-          </p>
-          <div className="flex flex-col items-center gap-2 opacity-80 animate-bounce cursor-pointer" onClick={startVideo}>
-            <p className="font-dmsans font-semibold text-[0.6rem] md:text-[0.67rem] tracking-[0.2em] md:tracking-[0.22em] uppercase text-white/90" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>Scroll to watch</p>
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" className="text-white drop-shadow-lg">
-              <path d="M5 8l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-        </div>
-
-        {/* END overlay */}
-        <div
-          className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-6 transition-opacity duration-700"
-          style={{ opacity: isEnd ? 1 : 0, pointerEvents: isEnd ? 'auto' : 'none' }}
-        >
-          <div style={{ opacity: showSizes ? 1 : 0, transform: showSizes ? 'translateY(0)' : 'translateY(10px)', transition: 'all 0.5s ease' }}>
-            <p className="font-dmsans font-bold text-[#00BCD4] text-[0.75rem] tracking-[0.28em] uppercase mb-7 drop-shadow-md">
-              3.5 mm &nbsp;·&nbsp; 4 mm &nbsp;·&nbsp; 4.5 mm
+            <p className="font-dmsans font-medium text-[0.55rem] md:text-[0.67rem] tracking-[0.2em] md:tracking-[0.3em] uppercase text-white/80 mb-4 drop-shadow-xl mx-auto leading-relaxed">
+              <span className="md:hidden">INDARC E6013 &nbsp;·&nbsp; Hubli</span>
+              <span className="hidden md:inline">INDARC E6013 Welding Rods &nbsp;·&nbsp; Hubli, Karnataka</span>
             </p>
           </div>
-          <div style={{ opacity: showTitle ? 1 : 0, transform: showTitle ? 'translateY(0)' : 'translateY(10px)', transition: 'all 0.5s ease' }}>
-            <h2
-              className="font-display font-bold text-white leading-[1.05] mb-8 md:mb-10"
-              style={{ fontSize: 'clamp(2.4rem, 5.5vw, 4.8rem)', textShadow: '0 4px 40px rgba(0,0,0,0.9), 0 2px 10px rgba(0,0,0,0.6)' }}
+
+          {/* Title */}
+          <div
+            style={{
+              opacity: showTitle ? 1 : 0,
+              transform: showTitle ? 'translateY(0)' : 'translateY(12px)',
+              transition: 'opacity 0.7s ease, transform 0.7s ease',
+            }}
+          >
+            <h1
+              className="font-display font-bold text-white leading-[1.05] md:leading-[1.03] mb-4 md:mb-5"
+              style={{ fontSize: 'clamp(2.5rem, 9vw, 5.8rem)', textShadow: '0 4px 40px rgba(0,0,0,0.9), 0 2px 10px rgba(0,0,0,0.6)' }}
             >
-              <em>INDARC E6013 Rods</em>
+              Bulk Welding Rods.
               <br />
-              Bulk Ready Stock. Hubli.
-            </h2>
+              <em style={{ fontSize: 'clamp(2.2rem, 8vw, 5.8rem)' }}>Authorised Distributor.</em>
+            </h1>
           </div>
-          <div style={{ opacity: showCTA ? 1 : 0, transform: showCTA ? 'translateY(0)' : 'translateY(10px)', transition: 'all 0.5s ease', pointerEvents: 'auto' }}>
+
+          {/* Description */}
+          <div
+            style={{
+              opacity: showTitle ? 1 : 0,
+              transform: showTitle ? 'translateY(0)' : 'translateY(12px)',
+              transition: 'opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s',
+            }}
+          >
+            <p
+              className="font-dmsans font-light text-white/95 text-[0.85rem] md:text-[1rem] tracking-wide max-w-[290px] md:max-w-[460px] mb-8 md:mb-10 leading-[1.6] md:leading-relaxed mx-auto"
+              style={{ textShadow: '0 2px 16px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.8)' }}
+            >
+              <span className="md:hidden">Karnataka's trusted supplier of genuine INDARC electrodes. Ready stock for fast dispatch.</span>
+              <span className="hidden md:inline">Karnataka's trusted bulk supplier of genuine INDARC welding electrodes. Ready stock in Hubli for fast dispatch to contractors and fabrication teams.</span>
+            </p>
+          </div>
+
+          {/* Diameter Sizes List */}
+          <div
+            style={{
+              opacity: showCTA ? 1 : 0,
+              transform: showCTA ? 'translateY(0)' : 'translateY(10px)',
+              transition: 'opacity 0.8s ease, transform 0.8s ease',
+            }}
+            className="mb-8"
+          >
+            <p className="font-dmsans font-bold text-[#00BCD4] text-[0.75rem] tracking-[0.28em] uppercase drop-shadow-md">
+              3.5 mm &nbsp;·&nbsp; 4.0 mm &nbsp;·&nbsp; 4.5 mm
+            </p>
+          </div>
+
+          {/* CTA Button */}
+          <div
+            style={{
+              opacity: showCTA ? 1 : 0,
+              transform: showCTA ? 'translateY(0)' : 'translateY(10px)',
+              transition: 'opacity 0.8s ease 0.15s, transform 0.8s ease 0.15s',
+            }}
+          >
             <Link
               href="/contact"
               className="font-dmsans font-bold text-[0.78rem] tracking-[0.18em] uppercase text-white bg-[#00838F] px-10 py-4 rounded-full hover:bg-[#00BCD4] shadow-[0_10px_30px_rgba(0,188,212,0.3)] hover:shadow-[0_15px_40px_rgba(0,188,212,0.4)] hover:-translate-y-1 transition-all duration-300 cursor-pointer inline-block"
@@ -693,17 +624,22 @@ export default function Hero({ quoteOpen, onQuoteChange }) {
               Request A Bulk Quote →
             </Link>
           </div>
-          <Link
-            href="/contact"
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 cursor-pointer"
-            style={{ opacity: showCTA ? 0.75 : 0, transition: 'opacity 0.5s ease', pointerEvents: 'auto' }}
-          >
-            <p className="font-dmsans font-semibold text-[0.64rem] tracking-[0.22em] uppercase text-white/80" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>scroll for quote</p>
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="text-white animate-bounce drop-shadow-lg">
-              <path d="M5 8l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
         </div>
+
+        {/* Scroll Indicator */}
+        <Link
+          href="/contact"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 cursor-pointer z-10"
+          style={{
+            opacity: showCTA ? 0.75 : 0,
+            transition: 'opacity 0.5s ease 0.3s',
+          }}
+        >
+          <p className="font-dmsans font-semibold text-[0.64rem] tracking-[0.22em] uppercase text-white/80" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>scroll for quote</p>
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="text-white animate-bounce drop-shadow-lg">
+            <path d="M5 8l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Link>
       </section>
 
       {/* ── QUOTE PANEL ── */}
@@ -776,12 +712,8 @@ export default function Hero({ quoteOpen, onQuoteChange }) {
           <div className="relative md:mt-[-100vh]" style={{ zIndex: 30 }}>
             <section
               className="relative min-h-screen flex flex-col justify-center px-6 md:px-14 py-20 md:py-16"
-              style={{
-                backgroundImage: 'url(/contact_bg.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
             >
+              <Image src="/contact_bg.png" alt="" fill className="object-cover object-center" sizes="100vw" />
               {/* Dark Premium Overlay */}
               <div className="absolute inset-0 bg-[#060A22]/85 backdrop-blur-[2px]" />
               

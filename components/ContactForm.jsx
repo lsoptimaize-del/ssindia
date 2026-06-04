@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ContactForm({ dark = false }) {
   const inputClass = dark
@@ -19,6 +19,23 @@ export default function ContactForm({ dark = false }) {
     orderType: '',
     message: '',
   });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const prodParam = params.get('product');
+      if (prodParam) {
+        let matched = '';
+        if (prodParam.startsWith('3.5')) matched = '3.5mm INDARC E6013';
+        else if (prodParam.startsWith('4.5')) matched = '4.5mm INDARC E6013';
+        else if (prodParam.startsWith('4')) matched = '4mm INDARC E6013';
+        
+        if (matched) {
+          setForm((f) => ({ ...f, product: matched }));
+        }
+      }
+    }
+  }, []);
 
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 function useInView(options = { threshold: 0.1, rootMargin: '0px 0px -10% 0px' }) {
@@ -92,14 +93,15 @@ export default function AboutPageClient() {
         <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-end pb-32 md:pb-32 px-6 md:px-14 z-10">
           <div className="absolute inset-0 z-0">
             <div
-              className="absolute inset-0 bg-cover bg-center"
+              className="absolute inset-0"
               style={{
-                backgroundImage: 'url(/about_hero.png)',
                 opacity: Math.max(0.3, 1 - scrollY / (typeof window !== 'undefined' ? window.innerHeight : 1000)),
                 transform: `scale(${1 + scrollY * 0.0002})`,
                 transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
               }}
-            />
+            >
+              <Image src="/about_hero.png" alt="SS India Corporation warehouse" fill className="object-cover object-center" sizes="100vw" />
+            </div>
             {/* Base dark layer underneath */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#040714] via-[#040714]/60 to-transparent" />
           </div>
@@ -231,17 +233,21 @@ export default function AboutPageClient() {
             <div className="absolute inset-0 p-14">
               <div className="w-full h-full relative rounded-3xl overflow-hidden shadow-2xl border border-white/10">
                 {/* Santosh Image */}
-                <img
+                <Image
                   src="/owner_santosh.png"
                   alt="Santosh - Co-Founder"
-                  className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+                  fill
+                  className="object-cover transition-opacity duration-1000 ease-in-out"
+                  sizes="(min-width: 1024px) 50vw, 0vw"
                   style={{ opacity: activeOwner === 'santosh' ? 1 : 0 }}
                 />
                 {/* Sandeep Image */}
-                <img
+                <Image
                   src="/owner_sandeep.png"
                   alt="Sandeep - Co-Founder"
-                  className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+                  fill
+                  className="object-cover transition-opacity duration-1000 ease-in-out"
+                  sizes="(min-width: 1024px) 50vw, 0vw"
                   style={{ opacity: activeOwner === 'sandeep' ? 1 : 0 }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#080D2E] via-transparent to-transparent opacity-90" />
@@ -270,7 +276,7 @@ export default function AboutPageClient() {
                   {/* Santosh Card */}
                   <div className="w-[calc(100vw-3rem)] shrink-0 bg-white/5 border border-white/10 backdrop-blur-2xl rounded-[2rem] p-5 shadow-2xl flex flex-col gap-6">
                     <div className="w-full aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden relative shadow-inner">
-                      <img src="/owner_santosh.png" alt="Santosh" className="absolute inset-0 w-full h-full object-cover" />
+                      <Image src="/owner_santosh.png" alt="Santosh" fill className="object-cover" sizes="100vw" />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#080D2E] via-[#080D2E]/20 to-transparent opacity-90" />
                       <div className="absolute bottom-5 left-5">
                         <p className="font-display font-bold text-white text-3xl mb-1">Santosh</p>
@@ -297,7 +303,7 @@ export default function AboutPageClient() {
                   {/* Sandeep Card */}
                   <div className="w-[calc(100vw-3rem)] shrink-0 bg-white/5 border border-white/10 backdrop-blur-2xl rounded-[2rem] p-5 shadow-2xl flex flex-col gap-6">
                     <div className="w-full aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden relative shadow-inner">
-                      <img src="/owner_sandeep.png" alt="Sandeep" className="absolute inset-0 w-full h-full object-cover" />
+                      <Image src="/owner_sandeep.png" alt="Sandeep" fill className="object-cover" sizes="100vw" />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#080D2E] via-[#080D2E]/20 to-transparent opacity-90" />
                       <div className="absolute bottom-5 left-5">
                         <p className="font-display font-bold text-white text-3xl mb-1">Sandeep</p>

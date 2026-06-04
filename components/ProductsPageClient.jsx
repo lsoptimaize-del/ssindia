@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const products = [
@@ -80,10 +81,13 @@ export default function ProductsPageClient() {
       {/* ── HERO SECTION ── */}
       <section className="relative min-h-[50vh] md:min-h-[70vh] flex flex-col justify-end pt-[100px] pb-16 md:pb-24 px-6 md:px-14 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/bulk_inventory.png"
             alt="Industrial bulk inventory"
-            className="w-full h-full object-cover opacity-60"
+            fill
+            priority
+            className="object-cover opacity-60"
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#040714] via-[#040714]/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#040714] to-transparent opacity-80" />
@@ -130,10 +134,12 @@ export default function ProductsPageClient() {
                     transform: activeProduct === p.id ? 'scale(1)' : 'scale(1.05)',
                   }}
                 >
-                  <img
+                  <Image
                     src={p.img}
                     alt={`${p.size}mm INDARC rod`}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 50vw, 100vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#040714] via-[#040714]/20 to-transparent opacity-90" />
                 </div>
