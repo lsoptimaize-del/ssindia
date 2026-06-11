@@ -17,7 +17,7 @@ export default function ProductsPage() {
       <ProductsPageClient />
       <CTABanner
         headline="Need a Custom Quantity or Long-Term Supply?"
-        subtext="Talk directly to Santosh or Sandeep - no sales agents, no delays."
+        subtext="Talk directly to Santosh - no sales agents, no delays."
         buttonText="REQUEST A BULK QUOTE →"
         buttonHref="/contact"
       />

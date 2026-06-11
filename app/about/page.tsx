@@ -7,7 +7,7 @@ import AboutPageClient from '@/components/AboutPageClient';
 
 export const metadata: Metadata = {
   title: 'About SS India Corporation | INDARC Welding Rods Hubli',
-  description: "Owner-managed by Santosh & Sandeep. Karnataka's fastest growing INDARC welding rod distributor.",
+  description: "Owner-managed by Santosh. Karnataka's fastest growing INDARC welding rod distributor.",
 };
 
 const industries = [

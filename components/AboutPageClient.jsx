@@ -64,26 +64,8 @@ export default function AboutPageClient() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Section 3 logic: Active owner portrait
+  // Section 3 logic: Owner portrait
   const santoshRef = useRef(null);
-  const sandeepRef = useRef(null);
-  const [activeOwner, setActiveOwner] = useState('santosh');
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveOwner(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '-50% 0px -50% 0px' }
-    );
-    if (santoshRef.current) observer.observe(santoshRef.current);
-    if (sandeepRef.current) observer.observe(sandeepRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div className="bg-[#040714] text-white">
@@ -124,7 +106,7 @@ export default function AboutPageClient() {
             </RevealText>
             <RevealText delay={0.2}>
               <p className="font-dmsans font-light text-white/80 text-[0.95rem] md:text-[1.1rem] leading-relaxed max-w-sm md:max-w-lg">
-                Owner-managed by Santosh & Sandeep. Verified. Hubli-based.
+                Owner-managed by Santosh. Verified. Hubli-based.
                 Karnataka's fastest growing INDARC distributor since 2015.
               </p>
             </RevealText>
@@ -235,28 +217,18 @@ export default function AboutPageClient() {
                 {/* Santosh Image */}
                 <Image
                   src="/owner_santosh.png"
-                  alt="Santosh - Co-Founder"
+                  alt="Santosh - Founder & Proprietor"
                   fill
                   className="object-cover transition-opacity duration-1000 ease-in-out"
                   sizes="(min-width: 1024px) 50vw, 0vw"
-                  style={{ opacity: activeOwner === 'santosh' ? 1 : 0 }}
-                />
-                {/* Sandeep Image */}
-                <Image
-                  src="/owner_sandeep.png"
-                  alt="Sandeep - Co-Founder"
-                  fill
-                  className="object-cover transition-opacity duration-1000 ease-in-out"
-                  sizes="(min-width: 1024px) 50vw, 0vw"
-                  style={{ opacity: activeOwner === 'sandeep' ? 1 : 0 }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#080D2E] via-transparent to-transparent opacity-90" />
                 <div className="absolute bottom-10 left-10">
                   <p className="font-display font-bold text-white text-4xl mb-2">
-                    {activeOwner === 'santosh' ? 'Santosh' : 'Sandeep'}
+                    Santosh
                   </p>
                   <p className="font-dmsans font-medium text-[#00BCD4] text-[0.75rem] tracking-[0.2em] uppercase">
-                    Co-Founder & Owner
+                    Founder & Proprietor
                   </p>
                 </div>
               </div>
@@ -280,48 +252,21 @@ export default function AboutPageClient() {
                       <div className="absolute inset-0 bg-gradient-to-t from-[#080D2E] via-[#080D2E]/20 to-transparent opacity-90" />
                       <div className="absolute bottom-5 left-5">
                         <p className="font-display font-bold text-white text-3xl mb-1">Santosh</p>
-                        <p className="font-dmsans font-bold text-[#00BCD4] text-[0.6rem] tracking-[0.2em] uppercase">Co-Founder & Owner</p>
+                        <p className="font-dmsans font-bold text-[#00BCD4] text-[0.6rem] tracking-[0.2em] uppercase">Founder & Proprietor</p>
                       </div>
                     </div>
                     <div className="px-2 pb-2">
                       <RevealText delay={0}>
-                        <p className="font-dmsans font-bold text-[0.6rem] tracking-[0.28em] uppercase text-[#00838F] mb-3">The Logistics</p>
+                        <p className="font-dmsans font-bold text-[0.6rem] tracking-[0.28em] uppercase text-[#00838F] mb-3">The Founder</p>
                       </RevealText>
                       <RevealText delay={0.1}>
                         <h2 className="font-display font-bold text-white text-[1.5rem] leading-[1.2] mb-3">
-                          Santosh ensures your consignment leaves Hubli on time.
+                          Santosh
                         </h2>
                       </RevealText>
                       <RevealText delay={0.2}>
                         <p className="font-dmsans font-medium text-white/70 text-[0.9rem] leading-[1.6]">
-                          With over a decade in the welding consumables industry, Santosh manages client relationships and bulk order logistics. When you call to check on a delivery, he is the one coordinating directly with the transport hubs.
-                        </p>
-                      </RevealText>
-                    </div>
-                  </div>
-
-                  {/* Sandeep Card */}
-                  <div className="w-[calc(100vw-3rem)] shrink-0 bg-white/5 border border-white/10 backdrop-blur-2xl rounded-[2rem] p-5 shadow-2xl flex flex-col gap-6">
-                    <div className="w-full aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden relative shadow-inner">
-                      <Image src="/owner_sandeep.png" alt="Sandeep" fill className="object-cover" sizes="100vw" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#080D2E] via-[#080D2E]/20 to-transparent opacity-90" />
-                      <div className="absolute bottom-5 left-5">
-                        <p className="font-display font-bold text-white text-3xl mb-1">Sandeep</p>
-                        <p className="font-dmsans font-bold text-[#00BCD4] text-[0.6rem] tracking-[0.2em] uppercase">Co-Founder & Owner</p>
-                      </div>
-                    </div>
-                    <div className="px-2 pb-2">
-                      <RevealText delay={0}>
-                        <p className="font-dmsans font-bold text-[0.6rem] tracking-[0.28em] uppercase text-[#00838F] mb-3">The Product</p>
-                      </RevealText>
-                      <RevealText delay={0.1}>
-                        <h2 className="font-display font-bold text-white text-[1.5rem] leading-[1.2] mb-3">
-                          Sandeep guarantees every rod is 100% authentic INDARC.
-                        </h2>
-                      </RevealText>
-                      <RevealText delay={0.2}>
-                        <p className="font-dmsans font-medium text-white/70 text-[0.9rem] leading-[1.6]">
-                          As the product and procurement specialist, Sandeep manages stock integrity and supplier relationships. He is the reason we can confidently claim zero grey market stock.
+                          Santosh leads SS India Corporation with a vision to provide authentic, high-quality INDARC welding consumables. With over a decade of industry expertise, he has built a trusted distribution network focused on reliability, direct-to-buyer pricing, and uncompromising service across Karnataka.
                         </p>
                       </RevealText>
                     </div>
@@ -332,38 +277,20 @@ export default function AboutPageClient() {
 
             {/* DESKTOP LAYOUT (Vertical Scrolling Bios) */}
             <div className="hidden lg:flex flex-col gap-[50vh]">
-              <div id="santosh" ref={santoshRef} className="max-w-xl transition-all duration-700" style={{ opacity: activeOwner === 'santosh' ? 1 : 0.3 }}>
+              <div id="santosh" ref={santoshRef} className="max-w-xl pb-[20vh]">
                 <RevealText delay={0}>
                   <p className="font-dmsans font-bold text-[0.6rem] tracking-[0.28em] uppercase text-[#00838F] mb-6">
-                    The Logistics
+                    The Founder
                   </p>
                 </RevealText>
                 <RevealText delay={0.1}>
                   <h2 className="font-display font-bold text-white text-6xl leading-[1.1] mb-8">
-                    Santosh ensures your consignment leaves Hubli on time.
+                    Santosh
                   </h2>
                 </RevealText>
                 <RevealText delay={0.2}>
                   <p className="font-dmsans font-medium text-white/70 text-[1.1rem] leading-relaxed mb-6">
-                    With over a decade in the welding consumables industry, Santosh manages client relationships and bulk order logistics. When you call to check on a delivery, he is the one coordinating directly with the transport hubs.
-                  </p>
-                </RevealText>
-              </div>
-
-              <div id="sandeep" ref={sandeepRef} className="max-w-xl pb-[20vh] transition-all duration-700" style={{ opacity: activeOwner === 'sandeep' ? 1 : 0.3 }}>
-                <RevealText delay={0}>
-                  <p className="font-dmsans font-bold text-[0.6rem] tracking-[0.28em] uppercase text-[#00838F] mb-6">
-                    The Product
-                  </p>
-                </RevealText>
-                <RevealText delay={0.1}>
-                  <h2 className="font-display font-bold text-white text-6xl leading-[1.1] mb-8">
-                    Sandeep guarantees every rod is 100% authentic INDARC.
-                  </h2>
-                </RevealText>
-                <RevealText delay={0.2}>
-                  <p className="font-dmsans font-medium text-white/70 text-[1.1rem] leading-relaxed mb-6">
-                    As the product and procurement specialist, Sandeep manages stock integrity and supplier relationships. He is the reason we can confidently claim zero grey market stock.
+                    Santosh leads SS India Corporation with a vision to provide authentic, high-quality INDARC welding consumables. With over a decade of industry expertise, he has built a trusted distribution network focused on reliability, direct-to-buyer pricing, and uncompromising service across Karnataka.
                   </p>
                 </RevealText>
               </div>
